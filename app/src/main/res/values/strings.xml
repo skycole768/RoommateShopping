@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Roommate Shopping</string>
+    <string name="logout">logout</string>
+    <string name="login">login</string>
 </resources>
