@@ -1,5 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Roommate Shopping</string>
-    <string name="logout">logout</string>
-    <string name="login">login</string>
+    <string name="app_name">Roommate Shopping App</string>
+    
+    <!-- Login and Registration -->
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_logout">Logout</string>
+    
+    <!-- Shopping List -->
+    <string name="title_shopping_list">Shopping List</string>
+    <string name="hint_item_name">Item Name</string>
+    <string name="btn_add_item">Add Item</string>
+    <string name="btn_mark_purchased">Mark as Purchased</string>
+    
+    <!-- Recently Purchased -->
+    <string name="title_recently_purchased">Recently Purchased</string>
+    <string name="hint_price">Price</string>
+    
+    <!-- Settle Cost -->
+    <string name="title_settle_cost">Settle Cost</string>
+    <string name="label_total_cost">Total Cost: </string>
+    <string name="label_average_cost">Average Cost per Roommate: </string>
+    <string name="btn_settle">Settle Costs</string>
 </resources>
