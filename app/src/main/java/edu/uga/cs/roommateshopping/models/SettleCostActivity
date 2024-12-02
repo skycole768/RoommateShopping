@@ -1,0 +1,171 @@
+package edu.uga.cs.roomateshoppingapp;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import edu.uga.cs.roomateshoppingapp.models.Purchase;
+import edu.uga.cs.roomateshoppingapp.models.User;
+
+public class SettleCostActivity extends AppCompatActivity {
+    private TextView totalCostTextView;
+    private TextView averageCostTextView;
+    private TextView youOweTextView;
+    private TextView yourSpendingTextView;
+    private TextView balanceLabelTextView;
+    private Button settleCostButton;
+
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+    private NumberFormat currencyFormatter;
+    private double totalCost = 0;
+    private double averageCost = 0;
+    private double youOwe = 0;
+    private double yourSpending = 0;
+    private Map<String, Double> userSpending = new HashMap<>();
+    private int totalUsers = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settle_cost);
+
+        // Initialize Firebase
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+
+        // Initialize views
+        totalCostTextView = findViewById(R.id.totalCostTextView);
+        averageCostTextView = findViewById(R.id.averageCostTextView);
+        youOweTextView = findViewById(R.id.youOweTextView);
+        yourSpendingTextView = findViewById(R.id.yourSpendingTextView);
+        balanceLabelTextView = findViewById(R.id.balanceLabelTextView);
+        settleCostButton = findViewById(R.id.settleCostButton);
+
+        currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
+
+        // Set click listener
+        settleCostButton.setOnClickListener(v -> showSettlementConfirmation());
+
+        // Load data
+        loadUsers();
+    }
+
+    private void loadUsers() {
+        mDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                totalUsers = (int) dataSnapshot.getChildrenCount();
+                loadPurchases();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(SettleCostActivity.this, 
+                    "Failed to load users", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadPurchases() {
+        mDatabase.child("purchases")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        totalCost = 0;
+                        userSpending.clear();
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Purchase purchase = snapshot.getValue(Purchase.class);
+                            if (purchase != null) {
+                                totalCost += purchase.getTotalAmount();
+                                
+                                // Track individual spending
+                                String purchaser = purchase.getPurchasedBy();
+                                userSpending.put(purchaser, 
+                                    userSpending.getOrDefault(purchaser, 0.0) + purchase.getTotalAmount());
+                            }
+                        }
+
+                        // Calculate average cost per user
+                        averageCost = totalUsers > 0 ? totalCost / totalUsers : 0;
+
+                        // Calculate how much current user owes
+                        String currentUserEmail = mAuth.getCurrentUser().getEmail();
+                        yourSpending = userSpending.getOrDefault(currentUserEmail, 0.0);
+                        youOwe = averageCost - yourSpending;
+
+                        updateUI();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(SettleCostActivity.this, 
+                            "Failed to load purchases", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void updateUI() {
+        updateUI(totalCost, averageCost, youOwe, yourSpending);
+    }
+
+    private void updateUI(double totalCost, double averageCost, double youOwe, double yourSpending) {
+        totalCostTextView.setText(currencyFormatter.format(totalCost));
+        yourSpendingTextView.setText(currencyFormatter.format(yourSpending));
+        averageCostTextView.setText(currencyFormatter.format(averageCost));
+        
+        if (youOwe > 0) {
+            balanceLabelTextView.setText("You Owe:");
+            youOweTextView.setText(currencyFormatter.format(youOwe));
+            youOweTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            balanceLabelTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            balanceLabelTextView.setText("You Are Owed:");
+            youOweTextView.setText(currencyFormatter.format(-youOwe));
+            youOweTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            balanceLabelTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        }
+    }
+
+    private void showSettlementConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Settle Costs")
+                .setMessage("Are you sure you want to settle all costs? This will clear the purchase history.")
+                .setPositiveButton("Yes", (dialog, which) -> settleCosts())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void settleCosts() {
+        // Remove all purchases
+        mDatabase.child("purchases").removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Costs settled successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> 
+                    Toast.makeText(this, "Failed to settle costs", Toast.LENGTH_SHORT).show());
+    }
+}
