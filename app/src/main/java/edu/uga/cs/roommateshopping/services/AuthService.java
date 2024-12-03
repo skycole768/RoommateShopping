@@ -23,7 +23,7 @@ public class AuthService {
         }
 
         // At least one letter/one digit/one special character and min of 7 characters
-        String passwordPattern = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{7,}$";
+        String passwordPattern = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d#@$!%*?&]{7,}$";
 
         return password.matches(passwordPattern);
     }

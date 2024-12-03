@@ -3,7 +3,6 @@ package edu.uga.cs.roommateshopping.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.uga.cs.roommateshopping.R;
@@ -44,19 +42,21 @@ public class ShoppingBasketAdapter extends RecyclerView.Adapter<ShoppingBasketAd
 
         // Move item to the shopping list
         holder.removeButton.setOnClickListener(v -> {
-            ShoppingBasketServices basketService = new ShoppingBasketServices();
             basketService.moveItemToShoppingList(item.getId(), item, new ShoppingBasketServices.DatabaseCallback() {
                 @Override
                 public void onSuccess(String message) {
-                    // Remove the item from the local basket list
-                    basketItems.remove(position);
+                    int currentPosition = holder.getAdapterPosition();
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+                        // Remove the item from the local basket list
+                        basketItems.remove(currentPosition);
 
-                    // Notify the adapter about the removed item
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, basketItems.size());
+                        // Notify the adapter about the removed item
+                        notifyItemRemoved(currentPosition);
+                        notifyItemRangeChanged(currentPosition, basketItems.size());
 
-                    // Inform the user of the successful operation
-                    Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+                        // Inform the user of the successful operation
+                        Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
@@ -66,7 +66,6 @@ public class ShoppingBasketAdapter extends RecyclerView.Adapter<ShoppingBasketAd
                 }
             });
         });
-
     }
 
     @Override
@@ -79,7 +78,6 @@ public class ShoppingBasketAdapter extends RecyclerView.Adapter<ShoppingBasketAd
         this.basketItems.addAll(newBasketItems);
         notifyDataSetChanged(); // Notify the adapter about data changes
     }
-
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView itemNameTextView;

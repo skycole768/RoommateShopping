@@ -7,18 +7,20 @@ public class ShoppingItem {
     private double price;       // Price of the item
     private boolean purchased;  // Indicates if the item has been purchased
     private boolean selected;   // Indicates if the item is selected in the UI
+    private String addedBy;     // Email of the user who added the item
 
     // Empty constructor for Firebase
     public ShoppingItem() {}
 
     // Constructor
-    public ShoppingItem(String id, String name, int quantity, double price, boolean purchased) {
+    public ShoppingItem(String id, String name, int quantity, double price, boolean purchased, String addedBy) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
         this.price = price;
         this.purchased = purchased;
         this.selected = false;  // Default value for selection
+        this.addedBy = addedBy;
     }
 
     // Getters and Setters
@@ -70,6 +72,14 @@ public class ShoppingItem {
         this.selected = selected;
     }
 
+    public String getAddedBy() {
+        return addedBy;
+    }
+
+    public void setAddedBy(String addedBy) {
+        this.addedBy = addedBy;
+    }
+
     @Override
     public String toString() {
         return "ShoppingItem{" +
@@ -79,7 +89,7 @@ public class ShoppingItem {
                 ", price=" + price +
                 ", purchased=" + purchased +
                 ", selected=" + selected +
+                ", addedBy='" + addedBy + '\'' +
                 '}';
     }
 }
-
