@@ -16,6 +16,7 @@ import edu.uga.cs.roommateshopping.services.AuthService;
 public class MainActivity extends AppCompatActivity {
     private AuthService authService;
     private Button loginLogoutButton;
+    private Button viewShoppingBasketButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         authService = new AuthService();
-        loginLogoutButton = findViewById(R.id.loginLogoutButton);
-
+        loginLogoutButton = findViewById(R.id.logoutButton);
+        viewShoppingBasketButton = findViewById(R.id.viewShoppingBasket);
         // Set initial button state
         updateButtonState();
 
@@ -42,18 +43,25 @@ public class MainActivity extends AppCompatActivity {
                 updateButtonState();
             } else {
                 // User is not signed in
-                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
+                Intent loginIntent = new Intent(MainActivity.this, edu.uga.cs.roommateshopping.RegisterActivity.class);
+               startActivity(loginIntent);
             }
         });
-    }
+
+        viewShoppingBasketButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ShoppingBasketActivity.class);
+            startActivity(intent);
+        });
+
+
+}
 
     // Change button text depending on whether or not
     private void updateButtonState() {
         if (authService.isLoggedIn()) {
-            loginLogoutButton.setText(R.string.logout);
+            loginLogoutButton.setText("logout");
         } else {
-            loginLogoutButton.setText(R.string.login);
+            loginLogoutButton.setText("login");
         }
     }
 }

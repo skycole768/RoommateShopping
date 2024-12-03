@@ -15,7 +15,8 @@
         android:theme="@style/Theme.RoommateShopping"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".ShoppingBasketActivity"
+            android:theme="@style/Theme.RoommateShopping"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"

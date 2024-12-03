@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-22T22:28:21.102616Z">
+        <DropdownSelection timestamp="2024-12-03T11:48:32.214607Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/sky.cole768/.android/avd/Sky_Phone.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/sky.cole768/.android/avd/Pixel_8_API_35_2.avd" />
             </handle>
           </Target>
         </DropdownSelection>

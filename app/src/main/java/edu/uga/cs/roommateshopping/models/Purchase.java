@@ -1,4 +1,4 @@
-package edu.uga.cs.roomateshoppingapp.models;
+package edu.uga.cs.roommateshopping.models;
 
 import java.util.List;
 

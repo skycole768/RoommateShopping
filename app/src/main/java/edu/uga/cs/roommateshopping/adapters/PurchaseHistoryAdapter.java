@@ -1,4 +1,4 @@
-package edu.uga.cs.roomateshoppingapp.adapters;
+package edu.uga.cs.roommateshopping.adapters;
 
 import android.app.AlertDialog;
 import android.text.InputType;
@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import edu.uga.cs.roomateshoppingapp.R;
-import edu.uga.cs.roomateshoppingapp.models.Purchase;
-import edu.uga.cs.roomateshoppingapp.models.ShoppingItem;
+import edu.uga.cs.roommateshopping.R;
+import edu.uga.cs.roommateshopping.models.Purchase;
+import edu.uga.cs.roommateshopping.models.ShoppingItem;
 
 public class PurchaseHistoryAdapter extends RecyclerView.Adapter<PurchaseHistoryAdapter.ViewHolder> {
     private List<Purchase> purchases;
@@ -72,6 +72,7 @@ public class PurchaseHistoryAdapter extends RecyclerView.Adapter<PurchaseHistory
         
         // Set up return items button
         holder.returnItemsButton.setOnClickListener(v -> returnSelectedItems(v, purchase, holder));
+
     }
 
     private void showEditPriceDialog(View view, Purchase purchase) {

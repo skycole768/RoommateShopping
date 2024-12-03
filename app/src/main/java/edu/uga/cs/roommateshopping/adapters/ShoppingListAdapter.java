@@ -1,14 +1,16 @@
-package edu.uga.cs.roomateshoppingapp.adapters;
+package edu.uga.cs.roommateshopping.adapters;
 
 import android.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,8 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.uga.cs.roomateshoppingapp.R;
-import edu.uga.cs.roomateshoppingapp.models.ShoppingItem;
+import edu.uga.cs.roommateshopping.R;
+import edu.uga.cs.roommateshopping.models.ShoppingItem;
+import edu.uga.cs.roommateshopping.adapters.ShoppingBasketAdapter;
+import edu.uga.cs.roommateshopping.services.ShoppingBasketServices;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
     private List<ShoppingItem> shoppingItems;
@@ -71,6 +75,29 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         holder.editButton.setOnClickListener(v -> showEditDialog(v, item));
         holder.deleteButton.setOnClickListener(v -> showDeleteDialog(v, item));
+
+        holder.itemQuantityTextView.setText(String.valueOf(item.getQuantity()));
+
+        holder.itemQuantityTextView.setText(String.valueOf(item.getQuantity()));
+
+        holder.addToBasketButton.setOnClickListener(v -> {
+            ShoppingBasketServices basketService = new ShoppingBasketServices();
+            basketService.moveItemToBasket(item.getId(), item, new ShoppingBasketServices.DatabaseCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+                    // Remove the item from the list and notify the adapter
+                    shoppingItems.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, shoppingItems.size());
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(v.getContext(), "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     private void showEditDialog(View view, ShoppingItem item) {
@@ -150,6 +177,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         public TextView itemNameTextView;
         public ImageButton editButton;
         public ImageButton deleteButton;
+        public TextView itemQuantityTextView;
+        public ImageButton addToBasketButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -157,6 +186,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             itemNameTextView = itemView.findViewById(R.id.itemNameTextView);
             editButton = itemView.findViewById(R.id.editButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
+            itemQuantityTextView = itemView.findViewById(R.id.itemQuantityTextView);
+            addToBasketButton = itemView.findViewById(R.id.moveToBasketButton);
         }
     }
 }
